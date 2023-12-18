@@ -11,8 +11,21 @@ import os
 global servo_x
 global servo_y
 
+#舵机初始角度
 servo_x=90
 servo_y=90
+
+#继电器引脚编号
+relay_1=29#充电
+relay_2=31#放电
+
+#红外瞄准开关
+targeting_pin=33
+targeting_on=False
+
+
+#换弹舵机
+swap_servo_pin=35
 
 def limit_value(value, minimum, maximum):
     return [value, minimum, maximum].sort()[1]
@@ -39,8 +52,14 @@ def move_callback(msg):
 
     print(msg)
     return
-        
+
 def shooting_callback(msg):
+    #B充能
+    #A发射
+    #Y换弹
+    #X开关红外瞄准
+    pass
+    
     
 
 def joystick_thread():
