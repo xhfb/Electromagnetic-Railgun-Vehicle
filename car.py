@@ -8,20 +8,41 @@ import math
 from Rosmaster_Lib import Rosmaster
 import os
 
-def joystick_callback(msg):
+global servo_x
+global servo_y
+
+servo_x=90
+servo_y=90
+
+def limit_value(value, minimum, maximum):
+    return [value, minimum, maximum].sort()[1]
+
+
+
+def move_callback(msg):
+    global servo_x,servo_y
     speed_x=-msg["LY"]/32767
     speed_y=-msg["LX"]/32767
     angular_velocity=(msg["LT"]-msg["RT"])/32767/2
     
-    servo_x=-msg["RX"]/32767*90+90
-    servo_y=-msg["RY"]/32767*90+90
+    servo_dx=-msg["RX"]/32767
+    servo_dy=-msg["RY"]/32767
+    
+    servo_x+=servo_dx
+    servo_y+=servo_dy
+    
+    servo_x=limit_value(servo_x,0,180)
+    servo_y=limit_value(servo_y,0,180)
     
     controller.set_car_motion(speed_x,speed_y,angular_velocity)
     controller.set_pwm_servo_all(90,90,servo_x,servo_y)
-    
+
     print(msg)
     return
         
+def shooting_callback(msg):
+    
+
 def joystick_thread():
     """
     手柄线程
@@ -167,7 +188,7 @@ def joystick_thread():
                     axis_states["YY"] = value
                 #print(axis_states)
             merged_dict = {**axis_states, **button_states}
-            joystick_callback(msg=merged_dict)
+            move_callback(msg=merged_dict)
 
 if __name__=="__main__":
     controller=Rosmaster(com="/dev/ttyUSB0")
